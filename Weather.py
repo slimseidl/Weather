@@ -29,6 +29,7 @@ class WeatherData():
 
                 
                 daily_weather_data = {
+                    "Year": year,
                     "Date": weather_data["daily"]["time"][0],
                     "Avg Temp": weather_data["daily"]["temperature_2m_mean"][0],
                     "Max Wind": weather_data["daily"]["wind_speed_10m_max"][0],
