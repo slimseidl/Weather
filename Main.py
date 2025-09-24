@@ -4,6 +4,7 @@ from Weather import WeatherData
 from sqlalchemy import create_engine, Integer, Float, Column
 from sqlalchemy.orm import declarative_base, sessionmaker
 from tabulate import tabulate
+import sqlite3
 
 
 geolocator = Nominatim(user_agent="weather_app")
@@ -22,11 +23,12 @@ weather_data = WeatherForLocation.get_weather()
 
 base = declarative_base()
 
+
 class WeatherRecords(base):
-    __tablename__ = "Historical Weather Records"
+    __tablename__ = "HistoricalWeatherRecords"
     ID = Column(Integer, primary_key=True, autoincrement=True)
     Latitude = Column(Float, nullable=False)
-    Longitute = Column(Float, nullable=False)
+    Longitude = Column(Float, nullable=False)
     Month = Column(Integer,nullable=False)
     Day = Column(Integer,nullable=False)
     Years = Column(Integer,nullable=False)
@@ -38,6 +40,7 @@ class WeatherRecords(base):
 
 
 engine = create_engine('sqlite:///weather.db')
+base.metadata.create_all(engine)
 
 
 Session = sessionmaker(bind=engine)
@@ -61,3 +64,17 @@ for weather in weather_data:
 session.commit()
 session.close()
 
+def query_weather_records(latitude, longitude, month,day):
+    conn = sqlite3.connect("weather.db")
+
+    cursor = conn.cursor()
+
+    query = f"""SELECT * FROM HistoricalWeatherRecords WHERE latitude = {latitude} and longitude = {longitude}"""
+
+    cursor.execute(query)
+
+    results = cursor.fetchall()
+
+    print(results)
+
+query_weather_records(latitude,longitude,monthday[0], monthday[1])
