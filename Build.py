@@ -29,13 +29,22 @@ for year in years:
     if response.status_code == 200:
         weather_data = response.json()
 
-        for i in range(len(weather_data["daily"]["time"])):
-            daily_weather_data = {
-                "Date": weather_data["daily"]["time"][i],
-                "Avg Temp": weather_data["daily"]["temperature_2m_mean"][i],
-                "Max Wind": weather_data["daily"]["wind_speed_10m_max"][i],
-                "Precipitation": weather_data["daily"]["precipitation_sum"][i]
-            }
+        # for i in range(len(weather_data["daily"]["time"])):
+        daily_weather_data = {
+            "Date": weather_data["daily"]["time"][0],
+            "Avg Temp": weather_data["daily"]["temperature_2m_mean"][0],
+            "Max Wind": weather_data["daily"]["wind_speed_10m_max"][0],
+            "Precipitation": weather_data["daily"]["precipitation_sum"][0]
+        }
 
-            daily_weather_over_years.append(daily_weather_data)
+        daily_weather_over_years.append(daily_weather_data)
 
+    else:
+        print(f'Could not retrieve weather data with response code: {response.status_code}')
+
+
+print(daily_weather_over_years)
+
+tempInfo = None 
+
+for 
