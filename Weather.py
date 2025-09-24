@@ -3,20 +3,20 @@ import json
 
 
 class WeatherData():
-    def __init__(self,latitude=0.0, longitude=0.0,day=None,month=None,year=None):
+    def __init__(self,latitude=0.0, longitude=0.0,day=None,month=None,years=[20]):
         self.latitude = latitude
         self.longitude = longitude
         self.day = day
         self.month = month
-        self.year = year
+        self.years = years
 
 
     def get_weather(self):
         daily_weather_over_years = []
         for year in self.year:
             response = requests.get(f'https://archive-api.open-meteo.com/v1/archive?latitude={self.latitude}&longitude={self.longitude}'
-                                f'&start_date={self.year}-{self.month}-{self.day}&end_date={self.year}-{self.month}-{self.day}'
-                                f'&daily=temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max'
+                                f'&start_date={year}-{self.month}-{self.day}&end_date={year}-{self.month}-{self.day}'
+                                f'&daily=temperature_2m_mean,precipitation_sum,wind_speed_10m_max'
                                 f'&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch')
             
             if response.status_code == 200:
