@@ -11,9 +11,18 @@ state = input(f'Enter State: \n')
 location = geolocator.geocode(f'{city}, {state}')
 latitude = location.latitude
 longitude = location.longitude
-day = input()
-month = input()
-year = input()
+monthday = input("Enter a month and day in the following format: mm/dd\n").split("/")
+
+print(monthday[0], monthday[1])
+weatherCheck = WeatherData(latitude, longitude, monthday[0], monthday[1])
+
+weatherCheck.get_weather
+weatherCheck.get_average_temp()
+weatherCheck.get_wind_speed()
+
+weatherCheck.print_info()
+
+
 
 
 

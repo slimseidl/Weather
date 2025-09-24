@@ -47,4 +47,3 @@ print(daily_weather_over_years)
 
 tempInfo = None 
 
-for 
