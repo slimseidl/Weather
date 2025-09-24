@@ -13,7 +13,7 @@ latitude = location.latitude
 longitude = location.longitude
 monthday = input("Enter a month and day in the following format: mm/dd\n").split("/")
 
-print(monthday[0], monthday[1])
+# print(monthday[0], monthday[1])
 weatherCheck = WeatherData(latitude, longitude, monthday[0], monthday[1])
 
 weatherCheck.get_weather

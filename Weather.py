@@ -20,7 +20,8 @@ class WeatherData():
         for year in self.years:
             response = requests.get(f'https://archive-api.open-meteo.com/v1/archive?latitude={self.latitude}&longitude={self.longitude}'
                                 f'&start_date={year}-{self.month}-{self.day}&end_date={year}-{self.month}-{self.day}'
-                                f'&daily=temperature_2m_mean,precipitation_sum,wind_speed_10m_max'
+                                f'&daily=temperature_2m_mean,precipitation_sum,wind_speed_10m_max,'
+                                f'temperature_2m_max,temperature_2m_min'
                                 f'&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch') # ADD A MAX AND MIN TEMP FOR RECORDS
             
             if response.status_code == 200:
@@ -31,9 +32,9 @@ class WeatherData():
                     "Date": weather_data["daily"]["time"][0],
                     "Avg Temp": weather_data["daily"]["temperature_2m_mean"][0],
                     "Max Wind": weather_data["daily"]["wind_speed_10m_max"][0],
-                    "Precipitation": weather_data["daily"]["precipitation_sum"][0]
-                    # MAX TEMP
-                    # MIN TEMP
+                    "Precipitation": weather_data["daily"]["precipitation_sum"][0],
+                    "Max Temp": weather_data["daily"]["temperature_2m_max"][0],
+                    "Min Temp": weather_data["daily"]["temperature_2m_min"][0]
                 }
 
                 daily_weather_over_years.append(daily_weather_data)
@@ -74,11 +75,15 @@ class WeatherData():
             return None 
         
     def get_min_temp(self):
-        pass 
+        weather_info = self.get_weather()
+        minTemp = [day["Min Temp"] for day in weather_info]
+        return min(minTemp)
 
     def get_max_temp(self):
-        pass 
-    
+        weather_info = self.get_weather()
+        maxTemp = [day["Max Temp"] for day in weather_info]
+        return max(maxTemp)
+
         
     def print_info(self):
         latitude = self.latitude
@@ -96,6 +101,8 @@ class WeatherData():
         
         print(f'Weather information for {city}, {state} on {datetime.strptime((self.month + "/" + self.day),"%m/%d").strftime("%B %d")} over the last 5 years:\n'
               f'\t-Average Temperature: {self.get_average_temp():.1f} degrees Farenheit\n'
+              f'\t-Maximum Temperature: {self.get_max_temp():.1f} degrees Farenheit\n'
+              f'\t-Minimum Temperature: {self.get_min_temp():.1f} degrees Farenheit\n'
               f'\t-Average Max Wind Speed: {self.get_wind_speed():.2f} mph\n'
               f'\t-Average Total Precipitation: {self.get_precip():.2f}"')
     
