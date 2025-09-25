@@ -1,10 +1,11 @@
 from geopy.geocoders import Nominatim
 import requests
 from Weather import WeatherData
-from sqlalchemy import create_engine, Integer, Float, Column, String
+from sqlalchemy import create_engine, Integer, Float, Column, String, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker
 from tabulate import tabulate
 import sqlite3
+from sqlalchemy.exc import IntegrityError
 
 
 geolocator = Nominatim(user_agent="weather_app")
@@ -45,6 +46,10 @@ class WeatherRecords(base):
     city = Column(String, nullable=True)
     state = Column(String, nullable=True)
 
+    __table_args__ = (
+        UniqueConstraint('latitude', 'longitude', 'month', 'day', 'years', name='uq_weather_record'),
+    )
+
 
 engine = create_engine('sqlite:///weather.db')
 base.metadata.create_all(engine)
@@ -68,9 +73,13 @@ for weather in weather_data:
         city = city,
         state = state
     )
-    session.add(record)
+    try:
+        session.add(record)
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        print("Duplicate record skipped.")
 
-session.commit()
 session.close()
 
 def query_weather_records(latitude, longitude, month,day):
@@ -79,20 +88,15 @@ def query_weather_records(latitude, longitude, month,day):
     cursor = conn.cursor()
 
     query = """SELECT * 
-               FROM HistoricalWeatherRecords 
-               WHERE latitude = ? and longitude = ?
-               and month = ? and day = ? """
+               FROM HistoricalWeatherRecords"""
+    
+        # WHERE latitude = ? and longitude = ?
+        #         and month = ? and day = ?
 
-    cursor.execute(query, (latitude, longitude, month, day))
+    cursor.execute(query) # , (latitude, longitude, month, day)
 
     results = cursor.fetchall()
 
-
-    # location = geolocator.reverse((latitude,longitude),exactly_one=True)
-
-    # if location and "address" in location.raw:
-    #     city = location.raw["address"].get("city", "")
-    #     state = location.raw["address"].get("state","")
 
     results_list = []
     for result in results:
