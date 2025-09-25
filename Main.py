@@ -6,6 +6,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from tabulate import tabulate
 import sqlite3
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
 
 geolocator = Nominatim(user_agent="weather_app")
@@ -21,9 +22,14 @@ except Exception as e:
 latitude = location.latitude
 longitude = location.longitude
 monthday = input("Enter a month and day in the following format: mm/dd\n").split("/")
-# years = input().split() default is previous 5 years? 
+years_input = input("Enter years to get weather for (space separated), default is last 5:\n").strip()
+if years_input:
+    years = [int(i) for i in years_input.split()]
+else:
+    curent_year = datetime.now().year
+    years = [curent_year - i for i in range(1,6)]
 
-WeatherForLocation = WeatherData(latitude, longitude, monthday[0], monthday[1])
+WeatherForLocation = WeatherData(latitude, longitude, monthday[0], monthday[1], years)
 weather_data = WeatherForLocation.get_weather()
 
 
@@ -88,12 +94,12 @@ def query_weather_records(latitude, longitude, month,day):
     cursor = conn.cursor()
 
     query = """SELECT * 
-               FROM HistoricalWeatherRecords"""
+               FROM HistoricalWeatherRecords
+               WHERE latitude = ? and longitude = ?
+               and month = ? and day = ?"""
     
-        # WHERE latitude = ? and longitude = ?
-        #         and month = ? and day = ?
 
-    cursor.execute(query) # , (latitude, longitude, month, day)
+    cursor.execute(query, (latitude, longitude, month, day)) # , (latitude, longitude, month, day)
 
     results = cursor.fetchall()
 
@@ -119,4 +125,36 @@ def query_weather_records(latitude, longitude, month,day):
     print(tabulate(results_list,headers="keys"))
     conn.close()
 
+# query records just added
 query_weather_records(latitude,longitude,monthday[0], monthday[1])
+
+# Queries all records from database below
+
+# conn = sqlite3.connect("weather.db")
+# cursor = conn.cursor()
+# query = """Select * From HistoricalWeatherRecords"""
+# cursor.execute(query)
+
+# results = cursor.fetchall()
+
+
+# results_list = []
+# for result in results:
+
+#     data = {
+#         "Month": result[3],
+#         "Day": result[4],
+#         "Year": result[5],
+#         "Average Temp": result[6],
+#         "Max Wind Speed": result[7],
+#         "Total Precipitation": result[8],
+#         "Max Temp": result[9],
+#         "Min Temp": result[10],
+#         "City": result[11],
+#         "State": result[12]
+#     }
+
+#     results_list.append(data)
+
+# print(tabulate(results_list,headers="keys"))
+# conn.close()
